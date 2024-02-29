@@ -72,6 +72,12 @@ def run():
             # Mostrar el DataFrame clasificado
             st.write("Datos clasificados:")
             st.write(data_clasificado)
+
+            # Mostrar comentarios antivacunas
+            comentarios_antivacunas = data_clasificado[data_clasificado['Clasificación'] == 0][column_name]
+            st.write("Comentarios antivacunas:")
+            st.write(comentarios_antivacunas)
+
         except Exception as e:
             st.error(f"Error al cargar el archivo: {e}")
 
