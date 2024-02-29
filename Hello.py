@@ -203,8 +203,8 @@ def run():
 
     # Mostrar comentarios antivacunas al hacer clic en un botón
     if st.button("Mostrar comentarios dudas"):
-        comentarios_antivacunas = data[data['Clasificación_gpt_4'] == 3][column_name].tolist()
-        st.subheader("Comentarios antivacunas encontrados:")
+        comentarios_antivacunas = data[data['Clasificación_gpt_4'] == 2][column_name].tolist()
+        st.subheader("Comentarios de dudas:")
         if comentarios_antivacunas:
             for comentario in comentarios_antivacunas:
                 st.write(comentario)
