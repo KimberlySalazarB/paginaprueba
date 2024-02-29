@@ -18,11 +18,13 @@ import streamlit as st
 import pandas as pd
 import requests
 import openai
-#from openai import OpenAI
+from openai import OpenAI
 from openai import ChatCompletion
 from PIL import Image
 from io import BytesIO
 import subprocess
+from openai import OpenAI
+
 
 # Función para obtener el contenido de un archivo desde una URL
 def obtener_contenido_archivo(url):
@@ -37,7 +39,9 @@ def obtener_contenido_archivo(url):
 
 def clasificar_comentarios(data, column_name, api_key):
     # Configurar la API Key de OpenAI
-    openai.api_key = api_key
+    client = OpenAI(
+    api_key=api_key,  # this is also the default, it can be omitted
+    )
 
     # Definir el texto del prompt para la clasificación
     prompt = """
@@ -71,7 +75,7 @@ def clasificar_comentarios(data, column_name, api_key):
         comment = row[column_name]
         try:
             # Crear la solicitud de completado de chat
-            completion = openai.ChatCompletion.create(
+            completion = openai.chat.completions.create(
                 model="gpt-4",
                 messages=[
                     {"role": "system", "content": prompt},
