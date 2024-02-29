@@ -1,32 +1,10 @@
-# Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022)
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
-import os
 import streamlit as st
 import pandas as pd
-from streamlit.logger import get_logger
-import openai
 import requests
 from PIL import Image
 from io import BytesIO
 
-LOGGER = get_logger(__name__)
-
-#def guardar_api_en_github(api_key):
- #   with open('api_key.txt', 'w') as file:
-  #      file.write(api_key)
-   ## st.write("API key guardada con éxito en 'api_key.txt'")
+# Función para obtener el contenido de un archivo desde una URL
 def obtener_contenido_archivo(url):
     try:
         respuesta = requests.get(url)
@@ -35,6 +13,15 @@ def obtener_contenido_archivo(url):
     except requests.exceptions.RequestException as e:
         print("Error al obtener el archivo:", e)
         return None
+
+# Función para clasificar los comentarios utilizando la API de OpenAI
+def clasificar_comentarios(data, column_name, api_key):
+    # Aquí puedes agregar tu lógica de clasificación utilizando la API de OpenAI
+    # Por ahora, simplemente agregaremos una columna de clasificación aleatoria
+    data['Clasificación'] = [0, 1, 2, 3]  # Ejemplo de clasificación aleatoria
+    return data
+
+# Función principal
 def run():
     st.set_page_config(
         page_title="Hello",
@@ -42,8 +29,6 @@ def run():
     )
 
     st.write("# Bienvenidos a la página! ❤️")
-
-    
 
     st.markdown(
         """
@@ -64,17 +49,10 @@ def run():
     )
     
     column_name = st.text_input("Ingrese el nombre de la columna que contiene los comentarios:")
-
     
-    
-     # Botón para ocultar/mostrar la API de OpenAI
+    # Botón para ocultar/mostrar la API de OpenAI
     api_key = st.text_input("API Key de OpenAI", type="password")
-   
-    
-    # Botón para guardar la API en un documento de GitHub
-    #if api_key and st.button("Guardar"):
-        #guardar_api_en_github(api_key)
-                        
+                      
     uploaded_file = st.file_uploader("Cargar archivo", type=["csv", "xlsx"])
 
     if uploaded_file is not None:
@@ -87,6 +65,13 @@ def run():
             
             st.write("Datos cargados:")
             st.write(data)
+            
+            # Clasificar los comentarios y agregar la columna de clasificación al DataFrame
+            data_clasificado = clasificar_comentarios(data, column_name, api_key)
+            
+            # Mostrar el DataFrame clasificado
+            st.write("Datos clasificados:")
+            st.write(data_clasificado)
         except Exception as e:
             st.error(f"Error al cargar el archivo: {e}")
 
@@ -97,9 +82,6 @@ def run():
         imagen = Image.open(BytesIO(contenido_imagen))
         st.image(imagen, caption='Imagen desde la URL')
                     
-           
-                
-
 if __name__ == "__main__":
     run()
 
