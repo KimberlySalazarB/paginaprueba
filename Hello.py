@@ -17,7 +17,8 @@ import os
 import streamlit as st
 import pandas as pd
 import requests
-from openai import OpenAI
+import openai
+from openai import ChatCompletion
 from PIL import Image
 from io import BytesIO
 import subprocess
@@ -35,14 +36,14 @@ def obtener_contenido_archivo(url):
 # Función para clasificar los comentarios utilizando la API de OpenAI
 # Función para clasificar los comentarios
 # Función para clasificar los comentarios utilizando la API de OpenAI
+# Función para clasificar comentarios utilizando la API de OpenAI
 def clasificar_comentarios(data, column_name, api_key):
     # Configurar la API Key de OpenAI
-    #openai.api_key = api_key
-    
-    client = OpenAI(
-    # This is the default and can be omitted
-    api_key=api_key,
-    )
+    openai.api_key = api_key
+
+    # Crear un objeto de cliente de OpenAI
+    client = openai.ChatCompletion.create
+
     # Definir el texto del prompt para la clasificación
     prompt = """
     Tendrás un rol de clasificador de comentarios de una publicación relacionada con la vacuna contra el VPH.
@@ -58,7 +59,7 @@ def clasificar_comentarios(data, column_name, api_key):
 
     Ahora, clasifica el siguiente comentario, teniendo en cuenta que tu respuesta es solo un número:
     """
-    
+
     # Variable para almacenar la posición actual en el bucle
     current_index = 0
 
@@ -71,11 +72,11 @@ def clasificar_comentarios(data, column_name, api_key):
         # Verificar si se debe retomar desde el punto de reinicio guardado
         if index < current_index:
             continue
-        
+
         comment = row[column_name]
         try:
-        # Crear la solicitud de completado de chat
-            completion = client.chat.completions.create(
+            # Crear la solicitud de completado de chat
+            completion = client(
                 model="gpt-4",
                 messages=[
                     {"role": "system", "content": prompt},
@@ -84,28 +85,26 @@ def clasificar_comentarios(data, column_name, api_key):
                 temperature=0,
                 max_tokens=1
             )
-            response = completion.choices[0].message.content.strip()
+            response = completion['choices'][0]['message']['content'].strip()
 
             # Verificar si la respuesta es un número
             if response.isdigit():
                 # Convertir la respuesta a entero
                 response = int(response)
             else:
-                # Manejar el caso en el que la respuesta no es un número
-                # Puedes asignar un valor predeterminado o tomar cualquier otra acción apropiada
-                response = None  # o cualquier otro valor predeterminado que prefieras
-                print("no esta entregando un numero")
+                response = None
+
             data.at[index, 'Clasificación_gpt_4'] = response
-            
+
             # Guardar el DataFrame actualizado
-            data.to_csv('data_clasificado.csv', index=False)
+            #data.to_csv('data_clasificado.csv', index=False)
             st.write(api_key)
-        except:
-         #   # Manejar el error del servidor de OpenAI
-            print("Error del servidor de OpenAI:")
-           # print("Reanudando el proceso desde la iteración", index)
-            #break
-         
+        except Exception as e:
+            # Manejar el error del servidor de OpenAI
+            print("Error del servidor de OpenAI:", e)
+            print("Reanudando el proceso desde la iteración", index)
+            break
+
     return data
 
 
@@ -176,10 +175,10 @@ def run():
             
             # Clasificar los comentarios si se ha proporcionado la API Key
             if api_key:
-                openaiapi_key="'"+ str(api_key) + "'"
-                data = clasificar_comentarios(data, column_name, openaiapi_key)
+                #openaiapi_key="'"+ str(api_key) + "'"
+                data = clasificar_comentarios(data, column_name, api_key)
                 st.write("Datos clasificados:")
-                st.write(openaiapi_key)
+                #st.write(api_key)
                 st.write(data)
 
         except Exception as e:
