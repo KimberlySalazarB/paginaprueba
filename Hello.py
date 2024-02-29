@@ -17,7 +17,7 @@ import os
 import streamlit as st
 import pandas as pd
 import requests
-import openai
+from openai import OpenAI
 from PIL import Image
 from io import BytesIO
 import subprocess
@@ -37,7 +37,12 @@ def obtener_contenido_archivo(url):
 # Función para clasificar los comentarios utilizando la API de OpenAI
 def clasificar_comentarios(data, column_name, api_key):
     # Configurar la API Key de OpenAI
-    openai.api_key = api_key
+    #openai.api_key = api_key
+    
+    client = OpenAI(
+    # This is the default and can be omitted
+    api_key=api_key,
+    )
     # Definir el texto del prompt para la clasificación
     prompt = """
     Tendrás un rol de clasificador de comentarios de una publicación relacionada con la vacuna contra el VPH.
@@ -70,7 +75,7 @@ def clasificar_comentarios(data, column_name, api_key):
         comment = row[column_name]
         try:
         # Crear la solicitud de completado de chat
-            completion = openai.ChatCompletion.create(
+            completion = client.chat.completions.create(
                 model="gpt-4",
                 messages=[
                     {"role": "system", "content": prompt},
@@ -95,7 +100,7 @@ def clasificar_comentarios(data, column_name, api_key):
             # Guardar el DataFrame actualizado
             data.to_csv('data_clasificado.csv', index=False)
             st.write(api_key)
-        except openai.OpenAIError as e:
+        except client.OpenAIError as e:
             # Manejar el error del servidor de OpenAI
             print("Error del servidor de OpenAI:", e)
             print("Reanudando el proceso desde la iteración", index)
