@@ -38,7 +38,6 @@ def obtener_contenido_archivo(url):
 def clasificar_comentarios(data, column_name, api_key):
     # Configurar la API Key de OpenAI
     openai.api_key = api_key
-    model = "gpt-4"
     # Definir el texto del prompt para la clasificación
     prompt = """
     Tendrás un rol de clasificador de comentarios de una publicación relacionada con la vacuna contra el VPH.
@@ -145,7 +144,16 @@ def run():
     
     # Botón para ocultar/mostrar la API de OpenAI
     api_key = st.text_input("API Key de OpenAI", type="password")
+    # Recuperar la API Key de OpenAI
+    #openai_api_key = st.session_state.get("OPENAI_API_KEY")
 
+    # Mostrar advertencia si no se ha ingresado la API Key
+    #if not openai_api_key:
+        #st.warning(
+       #     "Ingrese su API Key de OpenAI en la barra lateral. Puede obtener una clave en "
+        #    "[https://platform.openai.com/account/api-keys](https://platform.openai.com/account/api-keys)."
+        #)
+        #return
     
                       
     uploaded_file = st.file_uploader("Cargar archivo", type=["csv", "xlsx"])
