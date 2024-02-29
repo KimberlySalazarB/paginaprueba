@@ -96,8 +96,8 @@ def clasificar_comentarios(data, column_name, api_key):
             st.write(api_key)
         except Exception as e:
             # Manejar el error del servidor de OpenAI
-            st.error("Error del servidor de OpenAI:", e)
-            st.error("Reanudando el proceso desde la iteración", index)
+            st.error("Error del servidor de OpenAI: " + str(e))
+            st.error("Reanudando el proceso desde la iteración " + str(index))
             break
 
     return data
