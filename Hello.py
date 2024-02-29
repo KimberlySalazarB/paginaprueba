@@ -136,14 +136,6 @@ def run():
         3: Comentarios que no se relacionan con la vacuna contra el VPH.  
     """
     )
-    
-    # Botón para instalar OpenAI 0.28
-    if st.button("Instalar OpenAI 0.28"):
-        result = subprocess.run(["pip", "install", "openai==0.28"], capture_output=True, text=True)
-        if result.returncode == 0:
-            st.success("OpenAI 0.28 ha sido instalado correctamente. Por favor, reinicia la aplicación.")
-        else:
-            st.error("Hubo un error durante la instalación de OpenAI 0.28.")
 
     column_name = st.text_input("Ingrese el nombre de la columna que contiene los comentarios:")
     
