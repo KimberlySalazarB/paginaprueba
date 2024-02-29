@@ -173,6 +173,7 @@ def run():
             if api_key:
                 data = clasificar_comentarios(data, column_name, api_key)
                 st.write("Datos clasificados:")
+                st.write(api_key)
                 st.write(data)
 
         except Exception as e:
