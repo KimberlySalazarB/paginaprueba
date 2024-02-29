@@ -37,12 +37,10 @@ def obtener_contenido_archivo(url):
 # Función para clasificar los comentarios
 # Función para clasificar los comentarios utilizando la API de OpenAI
 # Función para clasificar comentarios utilizando la API de OpenAI
+# Función para clasificar los comentarios utilizando la API de OpenAI
 def clasificar_comentarios(data, column_name, api_key):
     # Configurar la API Key de OpenAI
     openai.api_key = api_key
-
-    # Crear un objeto de cliente de OpenAI
-    client = openai.ChatCompletion.create
 
     # Definir el texto del prompt para la clasificación
     prompt = """
@@ -76,7 +74,7 @@ def clasificar_comentarios(data, column_name, api_key):
         comment = row[column_name]
         try:
             # Crear la solicitud de completado de chat
-            completion = client(
+            completion = ChatCompletion.create(
                 model="gpt-4",
                 messages=[
                     {"role": "system", "content": prompt},
