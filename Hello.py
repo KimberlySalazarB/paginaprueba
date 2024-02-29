@@ -18,7 +18,9 @@ import streamlit as st
 import pandas as pd
 import requests
 import openai
-from openai import ChatCompletion
+from openai import OpenAI
+
+
 from PIL import Image
 from io import BytesIO
 import subprocess
@@ -40,8 +42,7 @@ def obtener_contenido_archivo(url):
 # Función para clasificar los comentarios utilizando la API de OpenAI
 def clasificar_comentarios(data, column_name, api_key):
     # Configurar la API Key de OpenAI
-    openai.api_key = api_key
-
+    client = OpenAI(api_key=api_key)
     # Definir el texto del prompt para la clasificación
     prompt = """
     Tendrás un rol de clasificador de comentarios de una publicación relacionada con la vacuna contra el VPH.
@@ -74,15 +75,13 @@ def clasificar_comentarios(data, column_name, api_key):
         comment = row[column_name]
         try:
             # Crear la solicitud de completado de chat
-            completion = ChatCompletion.create(
-                model="gpt-4",
-                messages=[
-                    {"role": "system", "content": prompt},
-                    {"role": "user", "content": comment}
-                ],
-                temperature=0,
-                max_tokens=1
-            )
+            completion = client.chat.completions.create(model="gpt-4",
+            messages=[
+                {"role": "system", "content": prompt},
+                {"role": "user", "content": comment}
+            ],
+            temperature=0,
+            max_tokens=1)
             response = completion['choices'][0]['message']['content'].strip()
 
             # Verificar si la respuesta es un número
