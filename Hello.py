@@ -18,9 +18,8 @@ import streamlit as st
 import pandas as pd
 import requests
 import openai
-from openai import OpenAI
-
-
+#from openai import OpenAI
+from openai import ChatCompletion
 from PIL import Image
 from io import BytesIO
 import subprocess
@@ -35,22 +34,19 @@ def obtener_contenido_archivo(url):
         print("Error al obtener el archivo:", e)
         return None
 
-# Función para clasificar los comentarios utilizando la API de OpenAI
-# Función para clasificar los comentarios
-# Función para clasificar los comentarios utilizando la API de OpenAI
-# Función para clasificar comentarios utilizando la API de OpenAI
-# Función para clasificar los comentarios utilizando la API de OpenAI
+
 def clasificar_comentarios(data, column_name, api_key):
     # Configurar la API Key de OpenAI
-    client = OpenAI(api_key=api_key)
+    openai.api_key = api_key
+
     # Definir el texto del prompt para la clasificación
     prompt = """
     Tendrás un rol de clasificador de comentarios de una publicación relacionada con la vacuna contra el VPH.
     No tienes permitido responder otra cosa que no sean números. Las clasificaciones son:
 
-    Si el comentario tiene una postura contraria a la vacuna contra el VPH (antivacuna).La respuesta es: 0
-    Si el comentario tiene una postura a favor de la vacuna contra el VPH (provacuna).La respuesta es: 1
-    Si el comentario refleja una duda o dudas relacionadas con la vacuna contra el VPH.La respuesta es: 2
+    Si el comentario tiene una postura contraria a la vacuna contra el VPH (antivacuna). La respuesta es: 0
+    Si el comentario tiene una postura a favor de la vacuna contra el VPH (provacuna). La respuesta es: 1
+    Si el comentario refleja una duda o dudas relacionadas con la vacuna contra el VPH. La respuesta es: 2
     Si el comentario habla de cualquier otra cosa. La respuesta es: 3
 
     Trata de interpretar las intenciones de las personas, ya que se trata de comentarios de Facebook.
@@ -75,13 +71,15 @@ def clasificar_comentarios(data, column_name, api_key):
         comment = row[column_name]
         try:
             # Crear la solicitud de completado de chat
-            completion = client.chat.completions.create(model="gpt-4",
-            messages=[
-                {"role": "system", "content": prompt},
-                {"role": "user", "content": comment}
-            ],
-            temperature=0,
-            max_tokens=1)
+            completion = openai.ChatCompletion.create(
+                model="gpt-4",
+                messages=[
+                    {"role": "system", "content": prompt},
+                    {"role": "user", "content": comment}
+                ],
+                temperature=0,
+                max_tokens=1
+            )
             response = completion['choices'][0]['message']['content'].strip()
 
             # Verificar si la respuesta es un número
@@ -94,12 +92,12 @@ def clasificar_comentarios(data, column_name, api_key):
             data.at[index, 'Clasificación_gpt_4'] = response
 
             # Guardar el DataFrame actualizado
-            #data.to_csv('data_clasificado.csv', index=False)
+            # data.to_csv('data_clasificado.csv', index=False)
             st.write(api_key)
         except Exception as e:
             # Manejar el error del servidor de OpenAI
-            print("Error del servidor de OpenAI:", e)
-            print("Reanudando el proceso desde la iteración", index)
+            st.error("Error del servidor de OpenAI:", e)
+            st.error("Reanudando el proceso desde la iteración", index)
             break
 
     return data
@@ -145,16 +143,10 @@ def run():
     
     # Botón para ocultar/mostrar la API de OpenAI
     api_key = st.text_input("API Key de OpenAI", type="password")
-    # Recuperar la API Key de OpenAI
-    #openai_api_key = st.session_state.get("OPENAI_API_KEY")
-
     # Mostrar advertencia si no se ha ingresado la API Key
-    #if not openai_api_key:
-        #st.warning(
-       #     "Ingrese su API Key de OpenAI en la barra lateral. Puede obtener una clave en "
-        #    "[https://platform.openai.com/account/api-keys](https://platform.openai.com/account/api-keys)."
-        #)
-        #return
+    if not api_key:
+        st.warning("Ingrese su API Key de OpenAI en la barra lateral.")
+        return
     
                       
     uploaded_file = st.file_uploader("Cargar archivo", type=["csv", "xlsx"])
