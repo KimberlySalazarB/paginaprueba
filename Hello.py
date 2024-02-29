@@ -55,15 +55,17 @@ def clasificar_comentarios(data, column_name, api_key):
 
         comment = row[column_name]
         try:
-            # Crear la solicitud de completado de chat
-            completion = openai.Completion.create(
-                engine="text-davinci-002",
-                prompt=prompt + comment,
+        # Crear la solicitud de completado de chat
+            completion = openai.ChatCompletion.create(
+                model="gpt-4",
+                messages=[
+                    {"role": "system", "content": prompt},
+                    {"role": "user", "content": comment}
+                ],
                 temperature=0,
                 max_tokens=1
             )
-
-            response = completion.choices[0].text.strip()
+            response = completion.choices[0].message.content.strip()
 
             # Verificar si la respuesta es un número
             if response.isdigit():
