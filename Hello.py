@@ -89,6 +89,13 @@ def run():
         comentarios_antivacunas = data_clasificado[data_clasificado['Clasificación'] == 0][column_name]
         st.write("Comentarios antivacunas:")
         st.write(comentarios_antivacunas)
+
+    # Botón para mostrar comentarios antivacunas
+    if st.button("Mostrar dudas"):
+        # Mostrar comentarios antivacunas
+        comentarios_antivacunas = data_clasificado[data_clasificado['Clasificación'] == 3][column_name]
+        st.write("Comentarios antivacunas:")
+        st.write(comentarios_antivacunas)
                     
 if __name__ == "__main__":
     run()
