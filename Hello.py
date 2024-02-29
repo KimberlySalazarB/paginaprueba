@@ -144,7 +144,7 @@ def run():
     api_key = st.text_input("API Key de OpenAI", type="password")
     # Mostrar advertencia si no se ha ingresado la API Key
     if not api_key:
-        st.warning("Ingrese su API Key de OpenAI en la barra lateral.")
+        st.warning("Ingrese su API Key de OpenAI.")
         return
     
                       
