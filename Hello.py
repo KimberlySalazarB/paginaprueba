@@ -91,7 +91,7 @@ def run():
             st.error(f"Error al cargar el archivo: {e}")
 
     # Mostrar la imagen desde una URL
-    url_imagen = "KimberlySalazarB/paginaprueba/Imagen3.jpg"
+    url_imagen = "https://github.com/KimberlySalazarB/paginaprueba/blob/main/Imagen3.jpg"
     contenido_imagen = obtener_contenido_archivo(url_imagen)
     if contenido_imagen is not None:
         imagen = Image.open(BytesIO(contenido_imagen))
