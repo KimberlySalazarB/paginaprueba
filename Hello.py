@@ -66,7 +66,7 @@ def clasificar_comentarios(data, column_name, api_key):
         # Verificar si se debe retomar desde el punto de reinicio guardado
         if index < current_index:
             continue
-
+        
         comment = row[column_name]
         try:
         # Crear la solicitud de completado de chat
@@ -89,7 +89,7 @@ def clasificar_comentarios(data, column_name, api_key):
                 # Manejar el caso en el que la respuesta no es un número
                 # Puedes asignar un valor predeterminado o tomar cualquier otra acción apropiada
                 response = None  # o cualquier otro valor predeterminado que prefieras
-
+                print("no esta entregando un numero")
             data.at[index, 'Clasificación_gpt_4'] = response
             
             # Guardar el DataFrame actualizado
