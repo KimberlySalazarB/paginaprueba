@@ -19,6 +19,7 @@ def obtener_contenido_archivo(url):
 
 # Función para clasificar los comentarios utilizando la API de OpenAI
 # Función para clasificar los comentarios
+# Función para clasificar los comentarios utilizando la API de OpenAI
 def clasificar_comentarios(data, column_name, api_key):
     # Configurar la API Key de OpenAI
     openai.api_key = api_key
@@ -41,7 +42,6 @@ def clasificar_comentarios(data, column_name, api_key):
     
     # Variable para almacenar la posición actual en el bucle
     current_index = 0
-    completed = False
 
     # Crear una columna vacía para almacenar las respuestas si aún no existe
     if 'Clasificación_gpt_4' not in data.columns:
@@ -56,17 +56,14 @@ def clasificar_comentarios(data, column_name, api_key):
         comment = row[column_name]
         try:
             # Crear la solicitud de completado de chat
-            completion = openai.ChatCompletion.create(
-                model="gpt-4",
-                messages=[
-                    {"role": "system", "content": prompt},
-                    {"role": "user", "content": comment}
-                ],
+            completion = openai.Completion.create(
+                engine="text-davinci-002",
+                prompt=prompt + comment,
                 temperature=0,
                 max_tokens=1
             )
 
-            response = completion.choices[0].message.content.strip()
+            response = completion.choices[0].text.strip()
 
             # Verificar si la respuesta es un número
             if response.isdigit():
@@ -86,13 +83,10 @@ def clasificar_comentarios(data, column_name, api_key):
             # Manejar el error del servidor de OpenAI
             print("Error del servidor de OpenAI:", e)
             print("Reanudando el proceso desde la iteración", index)
-            completed = False
             break
-    else:
-        # El bucle for se completó sin errores, terminar el proceso
-        completed = True
 
     return data
+
 
 # Función principal
 def run():
