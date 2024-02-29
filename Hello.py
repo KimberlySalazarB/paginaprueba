@@ -21,99 +21,78 @@ def obtener_contenido_archivo(url):
 # Función para clasificar los comentarios
 def clasificar_comentarios(data, column_name, api_key):
     # Configurar la API Key de OpenAI
-        openai.api_key = api_key
+    openai.api_key = api_key
     
     # Definir el texto del prompt para la clasificación
-        prompt = """
-        Tendrás un rol de clasificador de comentarios de una publicación relacionada con la vacuna contra el VPH.
-        No tienes permitido responder otra cosa que no sean números. Las clasificaciones son:
+    prompt = """
+    Tendrás un rol de clasificador de comentarios de una publicación relacionada con la vacuna contra el VPH.
+    No tienes permitido responder otra cosa que no sean números. Las clasificaciones son:
 
-        Si el comentario tiene una postura contraria a la vacuna contra el VPH (antivacuna).La respuesta es: 0
-        Si el comentario tiene una postura a favor de la vacuna contra el VPH (provacuna).La respuesta es: 1
-        Si el comentario refleja una duda o dudas relacionadas con la vacuna contra el VPH.La respuesta es: 2
-        Si el comentario habla de cualquier otra cosa. La respuesta es: 3
+    Si el comentario tiene una postura contraria a la vacuna contra el VPH (antivacuna).La respuesta es: 0
+    Si el comentario tiene una postura a favor de la vacuna contra el VPH (provacuna).La respuesta es: 1
+    Si el comentario refleja una duda o dudas relacionadas con la vacuna contra el VPH.La respuesta es: 2
+    Si el comentario habla de cualquier otra cosa. La respuesta es: 3
 
-        Trata de interpretar las intenciones de las personas, ya que se trata de comentarios de Facebook.
-        Si no puedes clasificar, tu respuesta debe ser "3".
+    Trata de interpretar las intenciones de las personas, ya que se trata de comentarios de Facebook.
+    Si no puedes clasificar, tu respuesta debe ser "3".
 
-        Ahora, clasifica el siguiente comentario, teniendo en cuenta que tu respuesta es solo un número:
-        """
-        batch_size = 20  # Tamaño del lote de comentarios a procesar antes de guardar
-    
-    #output_file = "data_clasificado.xlsx"  # Nombre del archivo de salida
-    #checkpoint_file = "checkpoint.txt"  # Nombre del archivo de checkpoint
+    Ahora, clasifica el siguiente comentario, teniendo en cuenta que tu respuesta es solo un número:
+    """
     
     # Variable para almacenar la posición actual en el bucle
-        current_index = 0
-        completed = False
-    #while not completed:
-        # Verificar si existe un archivo de checkpoint
-      #  try:
-       #     with open(checkpoint_file, 'r') as f:
-         #       current_index = int(f.read())
-        #    print("Se encontró un archivo de checkpoint. Continuando desde la posición:", current_index)
-        #except FileNotFoundError:
-         #   print("No se encontró un archivo de checkpoint. Comenzando desde el principio.")
+    current_index = 0
+    completed = False
 
-        # Crear una columna vacía para almacenar las respuestas si aún no existe
-        if 'Clasificación_gpt_4' not in data.columns:
-            data['Clasificación_gpt_4'] = ''
+    # Crear una columna vacía para almacenar las respuestas si aún no existe
+    if 'Clasificación_gpt_4' not in data.columns:
+        data['Clasificación_gpt_4'] = ''
 
-        # Iterar sobre cada comentario en el DataFrame
-        for index, row in data.iterrows():
-            # Verificar si se debe retomar desde el punto de reinicio guardado
-            if index < current_index:
-                continue
+    # Iterar sobre cada comentario en el DataFrame
+    for index, row in data.iterrows():
+        # Verificar si se debe retomar desde el punto de reinicio guardado
+        if index < current_index:
+            continue
 
-            comment = row[column_name]
-            try:
-                # Crear la solicitud de completado de chat
-                completion = openai.ChatCompletion.create(
-                    model="gpt-4",
-                    messages=[
-                        {"role": "system", "content": prompt},
-                        {"role": "user", "content": comment}
-                    ],
-                    temperature=0,
-                    max_tokens=1
-                )
+        comment = row[column_name]
+        try:
+            # Crear la solicitud de completado de chat
+            completion = openai.ChatCompletion.create(
+                model="gpt-4",
+                messages=[
+                    {"role": "system", "content": prompt},
+                    {"role": "user", "content": comment}
+                ],
+                temperature=0,
+                max_tokens=1
+            )
 
-                response = completion.choices[0].message.content.strip()
+            response = completion.choices[0].message.content.strip()
 
-                # Verificar si la respuesta es un número
-                if response.isdigit():
-                    # Convertir la respuesta a entero
-                    response = int(response)
-                else:
-                    # Manejar el caso en el que la respuesta no es un número
-                    # Puedes asignar un valor predeterminado o tomar cualquier otra acción apropiada
-                    response = None  # o cualquier otro valor predeterminado que prefieras
+            # Verificar si la respuesta es un número
+            if response.isdigit():
+                # Convertir la respuesta a entero
+                response = int(response)
+            else:
+                # Manejar el caso en el que la respuesta no es un número
+                # Puedes asignar un valor predeterminado o tomar cualquier otra acción apropiada
+                response = None  # o cualquier otro valor predeterminado que prefieras
 
-                data.at[index, 'Clasificación_gpt_4'] = response
-                
-                # Guardar el DataFrame en un archivo después de procesar un lote de comentarios
-                #if (index + 1) % batch_size == 0 or (index + 1) == len(data):
-                 #   data[:index + 1].to_excel(output_file, index=False)
-                  #  print("Guardando...")
+            data.at[index, 'Clasificación_gpt_4'] = response
+            
+            # Guardar el DataFrame actualizado
+            data.to_csv('data_clasificado.csv', index=False)
 
-                    # Guardar la posición actual como punto de reinicio
-                    #with open(checkpoint_file, 'w') as file:
-                     #   file.write(str(index + 1))
+        except openai.OpenAIError as e:
+            # Manejar el error del servidor de OpenAI
+            print("Error del servidor de OpenAI:", e)
+            print("Reanudando el proceso desde la iteración", index)
+            completed = False
+            break
+    else:
+        # El bucle for se completó sin errores, terminar el proceso
+        completed = True
 
-            except openai.OpenAIError as e:
-                # Manejar el error del servidor de OpenAI
-                print("Error del servidor de OpenAI:", e)
-                print("Reanudando el proceso desde la iteración", index)
-                completed = False
-                break
-        else:
-            # El bucle for se completó sin errores, terminar el proceso
-            completed = True
-            #with open(checkpoint_file, 'w') as file:
-             #   file.write(str(0))
-                #open_file = True
-
-        return data
+    return data
 
 # Función principal
 def run():
@@ -205,7 +184,7 @@ def run():
             for comentario in comentarios_antivacunas:
                 st.write(comentario)
         else:
-            st.write("No se encontraron comentarios antivacunas.")
+            st.write("No se encontraron comentarios dudas.")
                     
 if __name__ == "__main__":
     run()
