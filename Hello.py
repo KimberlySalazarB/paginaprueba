@@ -38,71 +38,74 @@ def obtener_contenido_archivo(url):
 
 
 def clasificar_comentarios(data, column_name, api_key):
-    # Configurar la API Key de OpenAI
-    client = OpenAI(
-    api_key=api_key,  # this is also the default, it can be omitted
-    )
+    try:
+        # Configurar la API Key de OpenAI
+        client = OpenAI(api_key=api_key)
 
-    # Definir el texto del prompt para la clasificación
-    prompt = """
-    Tendrás un rol de clasificador de comentarios de una publicación relacionada con la vacuna contra el VPH.
-    No tienes permitido responder otra cosa que no sean números. Las clasificaciones son:
+        # Definir el texto del prompt para la clasificación
+        prompt = """
+        Tendrás un rol de clasificador de comentarios de una publicación relacionada con la vacuna contra el VPH.
+        No tienes permitido responder otra cosa que no sean números. Las clasificaciones son:
 
-    Si el comentario tiene una postura contraria a la vacuna contra el VPH (antivacuna). La respuesta es: 0
-    Si el comentario tiene una postura a favor de la vacuna contra el VPH (provacuna). La respuesta es: 1
-    Si el comentario refleja una duda o dudas relacionadas con la vacuna contra el VPH. La respuesta es: 2
-    Si el comentario habla de cualquier otra cosa. La respuesta es: 3
+        Si el comentario tiene una postura contraria a la vacuna contra el VPH (antivacuna). La respuesta es: 0
+        Si el comentario tiene una postura a favor de la vacuna contra el VPH (provacuna). La respuesta es: 1
+        Si el comentario refleja una duda o dudas relacionadas con la vacuna contra el VPH. La respuesta es: 2
+        Si el comentario habla de cualquier otra cosa. La respuesta es: 3
 
-    Trata de interpretar las intenciones de las personas, ya que se trata de comentarios de Facebook.
-    Si no puedes clasificar, tu respuesta debe ser "3".
+        Trata de interpretar las intenciones de las personas, ya que se trata de comentarios de Facebook.
+        Si no puedes clasificar, tu respuesta debe ser "3".
 
-    Ahora, clasifica el siguiente comentario, teniendo en cuenta que tu respuesta es solo un número:
-    """
+        Ahora, clasifica el siguiente comentario, teniendo en cuenta que tu respuesta es solo un número:
+        """
 
-    # Variable para almacenar la posición actual en el bucle
-    current_index = 0
+        # Variable para almacenar la posición actual en el bucle
+        current_index = 0
 
-    # Crear una columna vacía para almacenar las respuestas si aún no existe
-    if 'Clasificación_gpt_4' not in data.columns:
-        data['Clasificación_gpt_4'] = ''
+        # Crear una columna vacía para almacenar las respuestas si aún no existe
+        if 'Clasificación_gpt_4' not in data.columns:
+            data['Clasificación_gpt_4'] = ''
 
-    # Iterar sobre cada comentario en el DataFrame
-    for index, row in data.iterrows():
-        # Verificar si se debe retomar desde el punto de reinicio guardado
-        if index < current_index:
-            continue
+        # Iterar sobre cada comentario en el DataFrame
+        for index, row in data.iterrows():
+            # Verificar si se debe retomar desde el punto de reinicio guardado
+            if index < current_index:
+                continue
 
-        comment = row[column_name]
-        try:
-            # Crear la solicitud de completado de chat
-            completion = openai.chat.completions.create(
-                model="gpt-4",
-                messages=[
-                    {"role": "system", "content": prompt},
-                    {"role": "user", "content": comment}
-                ],
-                temperature=0,
-                max_tokens=1
-            )
-            response = completion['choices'][0]['message']['content'].strip()
+            comment = row[column_name]
+            try:
+                # Crear la solicitud de completado de chat
+                completion = client.chat.create_completion(
+                    model="gpt-4",
+                    messages=[
+                        {"role": "system", "content": prompt},
+                        {"role": "user", "content": comment}
+                    ],
+                    temperature=0,
+                    max_tokens=1
+                )
+                response = completion.choices[0].message.content.strip()
 
-            # Verificar si la respuesta es un número
-            if response.isdigit():
-                # Convertir la respuesta a entero
-                response = int(response)
-            else:
-                response = None
+                # Verificar si la respuesta es un número
+                if response.isdigit():
+                    # Convertir la respuesta a entero
+                    response = int(response)
+                else:
+                    response = None
 
-            data.at[index, 'Clasificación_gpt_4'] = response
+                data.at[index, 'Clasificación_gpt_4'] = response
 
-            # Guardar el DataFrame actualizado
-            # data.to_csv('data_clasificado.csv', index=False)
-            st.write(api_key)
-        except Exception as e:
-            # Manejar el error del servidor de OpenAI
-            st.error("Error del servidor de OpenAI: " + str(e))
-            st.error("Reanudando el proceso desde la iteración " + str(index))
-            break
+                # Guardar el DataFrame actualizado
+                # data.to_csv('data_clasificado.csv', index=False)
+                st.write(api_key)
+            except Exception as e:
+                # Manejar el error del servidor de OpenAI
+                st.error("Error del servidor de OpenAI: " + str(e))
+                st.error("Reanudando el proceso desde la iteración " + str(index))
+                break
+
+    except Exception as e:
+        # Manejar cualquier otro error
+        st.error("Error: " + str(e))
 
     return data
 
