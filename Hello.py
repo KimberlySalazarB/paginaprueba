@@ -21,10 +21,10 @@ def obtener_contenido_archivo(url):
 # Función para clasificar los comentarios
 def clasificar_comentarios(data, column_name, api_key):
     # Configurar la API Key de OpenAI
-    openai.api_key = api_key
+        openai.api_key = api_key
     
     # Definir el texto del prompt para la clasificación
-    prompt = """
+        prompt = """
         Tendrás un rol de clasificador de comentarios de una publicación relacionada con la vacuna contra el VPH.
         No tienes permitido responder otra cosa que no sean números. Las clasificaciones son:
 
@@ -37,23 +37,23 @@ def clasificar_comentarios(data, column_name, api_key):
         Si no puedes clasificar, tu respuesta debe ser "3".
 
         Ahora, clasifica el siguiente comentario, teniendo en cuenta que tu respuesta es solo un número:
-    """
-    batch_size = 20  # Tamaño del lote de comentarios a procesar antes de guardar
+        """
+        batch_size = 20  # Tamaño del lote de comentarios a procesar antes de guardar
     
-    output_file = "data_clasificado.xlsx"  # Nombre del archivo de salida
-    checkpoint_file = "checkpoint.txt"  # Nombre del archivo de checkpoint
+    #output_file = "data_clasificado.xlsx"  # Nombre del archivo de salida
+    #checkpoint_file = "checkpoint.txt"  # Nombre del archivo de checkpoint
     
     # Variable para almacenar la posición actual en el bucle
-    current_index = 0
-    completed = False
-    while not completed:
+        current_index = 0
+        completed = False
+    #while not completed:
         # Verificar si existe un archivo de checkpoint
-        try:
-            with open(checkpoint_file, 'r') as f:
-                current_index = int(f.read())
-            print("Se encontró un archivo de checkpoint. Continuando desde la posición:", current_index)
-        except FileNotFoundError:
-            print("No se encontró un archivo de checkpoint. Comenzando desde el principio.")
+      #  try:
+       #     with open(checkpoint_file, 'r') as f:
+         #       current_index = int(f.read())
+        #    print("Se encontró un archivo de checkpoint. Continuando desde la posición:", current_index)
+        #except FileNotFoundError:
+         #   print("No se encontró un archivo de checkpoint. Comenzando desde el principio.")
 
         # Crear una columna vacía para almacenar las respuestas si aún no existe
         if 'Clasificación_gpt_4' not in data.columns:
@@ -92,13 +92,13 @@ def clasificar_comentarios(data, column_name, api_key):
                 data.at[index, 'Clasificación_gpt_4'] = response
                 
                 # Guardar el DataFrame en un archivo después de procesar un lote de comentarios
-                if (index + 1) % batch_size == 0 or (index + 1) == len(data):
-                    data[:index + 1].to_excel(output_file, index=False)
-                    print("Guardando...")
+                #if (index + 1) % batch_size == 0 or (index + 1) == len(data):
+                 #   data[:index + 1].to_excel(output_file, index=False)
+                  #  print("Guardando...")
 
                     # Guardar la posición actual como punto de reinicio
-                    with open(checkpoint_file, 'w') as file:
-                        file.write(str(index + 1))
+                    #with open(checkpoint_file, 'w') as file:
+                     #   file.write(str(index + 1))
 
             except openai.OpenAIError as e:
                 # Manejar el error del servidor de OpenAI
@@ -109,11 +109,11 @@ def clasificar_comentarios(data, column_name, api_key):
         else:
             # El bucle for se completó sin errores, terminar el proceso
             completed = True
-            with open(checkpoint_file, 'w') as file:
-                file.write(str(0))
-                open_file = True
+            #with open(checkpoint_file, 'w') as file:
+             #   file.write(str(0))
+                #open_file = True
 
-    return data
+        return data
 
 # Función principal
 def run():
@@ -142,8 +142,6 @@ def run():
     """
     )
     
-    column_name = st.text_input("Ingrese el nombre de la columna que contiene los comentarios:")
-    
     # Botón para instalar OpenAI 0.28
     if st.button("Instalar OpenAI 0.28"):
         result = subprocess.run(["pip", "install", "openai==0.28"], capture_output=True, text=True)
@@ -151,6 +149,10 @@ def run():
             st.success("OpenAI 0.28 ha sido instalado correctamente. Por favor, reinicia la aplicación.")
         else:
             st.error("Hubo un error durante la instalación de OpenAI 0.28.")
+
+    column_name = st.text_input("Ingrese el nombre de la columna que contiene los comentarios:")
+    
+    
     # Botón para ocultar/mostrar la API de OpenAI
     api_key = st.text_input("API Key de OpenAI", type="password")
 
