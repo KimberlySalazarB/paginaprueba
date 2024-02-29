@@ -94,13 +94,13 @@ def clasificar_comentarios(data, column_name, api_key):
             
             # Guardar el DataFrame actualizado
             data.to_csv('data_clasificado.csv', index=False)
-
+            st.write(api_key)
         except openai.OpenAIError as e:
             # Manejar el error del servidor de OpenAI
             print("Error del servidor de OpenAI:", e)
             print("Reanudando el proceso desde la iteración", index)
             break
-
+         
     return data
 
 
