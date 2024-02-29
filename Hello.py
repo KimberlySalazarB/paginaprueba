@@ -172,8 +172,8 @@ def run():
             
             # Clasificar los comentarios si se ha proporcionado la API Key
             if api_key:
-                openaiapi_key="'"+ str(api_key) + "'"
-                data = clasificar_comentarios(data, column_name, openaiapi_key)
+                #openaiapi_key="'"+ str(api_key) + "'"
+                data = clasificar_comentarios(data, column_name, api_key)
                 st.write("Datos clasificados:")
                 st.write(api_key)
                 st.write(data)
