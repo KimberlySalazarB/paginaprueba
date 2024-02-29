@@ -5,6 +5,7 @@ import requests
 import openai
 from PIL import Image
 from io import BytesIO
+import subprocess
 
 # Función para obtener el contenido de un archivo desde una URL
 def obtener_contenido_archivo(url):
@@ -145,6 +146,14 @@ def run():
     
     # Botón para ocultar/mostrar la API de OpenAI
     api_key = st.text_input("API Key de OpenAI", type="password")
+
+    # Botón para instalar OpenAI 0.28
+    if st.button("Instalar OpenAI 0.28"):
+        result = subprocess.run(["pip", "install", "openai==0.28"], capture_output=True, text=True)
+        if result.returncode == 0:
+            st.success("OpenAI 0.28 ha sido instalado correctamente. Por favor, reinicia la aplicación.")
+        else:
+            st.error("Hubo un error durante la instalación de OpenAI 0.28.")
                       
     uploaded_file = st.file_uploader("Cargar archivo", type=["csv", "xlsx"])
 
