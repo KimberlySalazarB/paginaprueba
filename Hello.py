@@ -74,7 +74,7 @@ def clasificar_comentarios(data, column_name, api_key):
             comment = row[column_name]
             try:
                 # Crear la solicitud de completado de chat
-                completion = client.ChatCompletion.create(
+                completion = client.chat.completions.create(
                     model="gpt-4",
                     messages=[
                         {"role": "system", "content": prompt},
