@@ -144,9 +144,6 @@ def run():
     
     column_name = st.text_input("Ingrese el nombre de la columna que contiene los comentarios:")
     
-    # Botón para ocultar/mostrar la API de OpenAI
-    api_key = st.text_input("API Key de OpenAI", type="password")
-
     # Botón para instalar OpenAI 0.28
     if st.button("Instalar OpenAI 0.28"):
         result = subprocess.run(["pip", "install", "openai==0.28"], capture_output=True, text=True)
@@ -154,6 +151,10 @@ def run():
             st.success("OpenAI 0.28 ha sido instalado correctamente. Por favor, reinicia la aplicación.")
         else:
             st.error("Hubo un error durante la instalación de OpenAI 0.28.")
+    # Botón para ocultar/mostrar la API de OpenAI
+    api_key = st.text_input("API Key de OpenAI", type="password")
+
+    
                       
     uploaded_file = st.file_uploader("Cargar archivo", type=["csv", "xlsx"])
 
