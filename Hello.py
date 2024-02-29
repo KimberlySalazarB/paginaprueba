@@ -37,7 +37,7 @@ def obtener_contenido_archivo(url):
 # Función para clasificar los comentarios utilizando la API de OpenAI
 def clasificar_comentarios(data, column_name, api_key):
     # Configurar la API Key de OpenAI
-    openai.api_key = api_key
+    openai.api_key = "'"+ str(api_key) + "'"
     # Definir el texto del prompt para la clasificación
     prompt = """
     Tendrás un rol de clasificador de comentarios de una publicación relacionada con la vacuna contra el VPH.
