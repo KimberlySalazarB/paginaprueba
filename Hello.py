@@ -18,7 +18,7 @@ def obtener_contenido_archivo(url):
 def clasificar_comentarios(data, column_name, api_key):
     # Aquí puedes agregar tu lógica de clasificación utilizando la API de OpenAI
     # Por ahora, simplemente agregaremos una columna de clasificación aleatoria
-    data['Clasificación'] = [0, 1, 2, 3]  # Ejemplo de clasificación aleatoria
+    data['Clasificación'] = [0, 1, 2, 3,0,1,2,3,0,1]  # Ejemplo de clasificación aleatoria
     return data
 
 # Función principal
