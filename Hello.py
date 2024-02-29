@@ -38,7 +38,7 @@ def obtener_contenido_archivo(url):
 def clasificar_comentarios(data, column_name, api_key):
     # Configurar la API Key de OpenAI
     openai.api_key = api_key
-    
+    model = "gpt-4"
     # Definir el texto del prompt para la clasificación
     prompt = """
     Tendrás un rol de clasificador de comentarios de una publicación relacionada con la vacuna contra el VPH.
