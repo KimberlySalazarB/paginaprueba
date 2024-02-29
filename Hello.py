@@ -19,7 +19,7 @@ import pandas as pd
 import requests
 import openai
 from openai import OpenAI
-from openai import ChatCompletion
+#from openai import ChatCompletion
 from PIL import Image
 from io import BytesIO
 import subprocess
