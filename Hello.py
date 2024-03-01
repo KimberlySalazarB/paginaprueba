@@ -137,15 +137,15 @@ def run():
     """
     )
 
-    column_name = st.text_input("Ingrese el nombre de la columna que contiene los comentarios:")
-    
-    
     # Botón para ocultar/mostrar la API de OpenAI
     api_key = st.text_input("API Key de OpenAI", type="password")
     # Mostrar advertencia si no se ha ingresado la API Key
     if not api_key:
         st.warning("Ingrese su API Key de OpenAI.")
         return
+
+    column_name = st.text_input("Ingrese el nombre de la columna que contiene los comentarios:")
+    
     
                       
     uploaded_file = st.file_uploader("Cargar archivo", type=["csv", "xlsx"])
